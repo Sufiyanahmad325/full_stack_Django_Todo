@@ -4,7 +4,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 import { useSelector, useDispatch } from 'react-redux'
-import { addTodo, deleteTodo, editTodo, isEdit } from './reduxToolkit/TodoSlice'
+import { getTodos, isEdit } from './reduxToolkit/TodoSlice'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -14,24 +14,16 @@ function App() {
   const dispatch = useDispatch()
 
   const handleAdd = (id) => {
-    if (text.trim() == "") return
-
-    if (isEditedValue != null) {
-      dispatch(editTodo({ id: isEditedValue.id, text: text }))
-      setText('')
-      return
-    }
-    dispatch(addTodo({ text: text }))
-    setText('')
+   
   }
 
   const handleEdit = (obj) => {
-    dispatch(isEdit(obj))
+   
   }
 
 
   const handleDelete = (id) => {
-    dispatch(deleteTodo(id))
+    
   }
 
   useEffect(() => {
@@ -39,6 +31,12 @@ function App() {
       setText(isEditedValue.text)
     }
   }, [isEditedValue])
+
+
+useEffect(()=>{
+  dispatch(getTodos())
+  console.log(blog)
+},[])
 
   return (
     <>
@@ -58,7 +56,7 @@ function App() {
             blog.length > 0 ? (
               blog.map((ele) => (
                 <div key={ele.id}>
-                  <p>{ele.text}</p>
+                  <p>{ele.title}</p>
                   <div className='flex flex-row gap-4'>
                     <button
                       className='bg-blue-500 text-white px-4 py-2 rounded'
