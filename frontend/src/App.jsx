@@ -4,7 +4,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 import { useSelector, useDispatch } from 'react-redux'
-import { getTodos, isEdit } from './reduxToolkit/TodoSlice'
+import { addTodo, editTodo, getTodos, isEdit } from './reduxToolkit/TodoSlice'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -13,12 +13,20 @@ function App() {
   const { blog, isEditedValue } = useSelector(state => state.todo)
   const dispatch = useDispatch()
 
-  const handleAdd = (id) => {
-   
+  const handleAdd = async() => {
+   if(isEditedValue != null){
+    let a =  await dispatch(editTodo({id:isEditedValue.id , title:text})).unwrap()
+    console.log(a)
+      setText("")
+      return
+   }
+    dispatch(addTodo({title:text}))
+      setText("")
+
   }
 
   const handleEdit = (obj) => {
-   
+        dispatch(isEdit(obj))
   }
 
 
@@ -28,7 +36,7 @@ function App() {
 
   useEffect(() => {
     if (isEditedValue != null) {
-      setText(isEditedValue.text)
+      setText(isEditedValue.title)
     }
   }, [isEditedValue])
 

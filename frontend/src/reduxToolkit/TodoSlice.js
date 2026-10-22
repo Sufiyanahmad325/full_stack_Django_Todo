@@ -12,65 +12,98 @@ export const getTodos = createAsyncThunk(
 );
 
 
-export const editTodo = createAsyncThunk(
-    "editTodo",
-    async({id,text})=>{
-        const response = await axios.patch(
-             `http://127.0.0.1:8000/api/todos/${id}/`,{title:text}
-        )
+export const addTodo = createAsyncThunk(
+    "addTodo",
+    async ({title}) => {
+        const response = await axios.post('http://127.0.0.1:8000/api/todos/', { title })
 
         return {
-            id:response.data.id,
-            text:response.data.title
+            id: response.data.id,
+            title: response.data.title
         }
     }
-)
+
+
+);
+
+
+export const editTodo = createAsyncThunk(
+  "editTodo",
+  async ({ id, title }) => {
+    const response = await axios.patch(
+      `http://127.0.0.1:8000/api/todos/${id}/`,
+      { title }
+    );
+
+    return {
+      id: response.data.id,
+      title: response.data.title,
+    };
+  }
+);
 
 const initialState = {
     blog: [],
     isEditedValue: null,
-    loading:false,
-    error:null
+    loading: false,
+    error: null
 }
 
 const todoSlice = createSlice({
     name: 'todoSlice',
     initialState,
 
-    extraReducers:(builder)=>{
+    extraReducers: (builder) => {
         builder
-        .addCase(getTodos.pending,(state)=>{
-            state.error = null
-            state.loading =true
-        })
-        .addCase(getTodos.fulfilled,(state,action)=>{
-            state.loading=false
-            state.blog=action.payload
-        })
-        .addCase(getTodos.rejected,(state,action)=>{
-            state.loading= false
-            state.error = action.error.message
-        })
-
-
-        //edit todo
-
-        .addCase(editTodo.pending , (state)=>{
-            state.error = null;
-            state.loading = true
-        })
-
-        .addCase(editTodo.fulfilled , (state,action)=>{
-            const updatedTodo = action.payload
-            state.blog = state.blog.map(ele=>{
-                ele.id === updatedTodo.id ? {...ele , text:updatedTodo.text}:ele
+            .addCase(getTodos.pending, (state) => {
+                state.error = null
+                state.loading = true
             })
-        })
+            .addCase(getTodos.fulfilled, (state, action) => {
+                state.loading = false
+                state.blog = action.payload
+            })
+            .addCase(getTodos.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.error.message
+            })
 
-        .addCase(editTodo.rejected,(state,action)=>{
-            state.loading= false
-            state.error = action.error.message
-        })
+
+            // addTodo
+
+            .addCase(addTodo.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addTodo.fulfilled, (state, action) => {
+                state.loading = false;
+                state.blog.unshift(action.payload);
+            })
+            .addCase(addTodo.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+
+
+
+            //edit todo
+
+            .addCase(editTodo.pending, (state) => {
+                state.error = null;
+                state.loading = true
+            })
+
+            .addCase(editTodo.fulfilled, (state, action) => {
+                const updatedTodo = action.payload
+                state.blog = state.blog.map(ele =>
+                    ele.id === updatedTodo.id ? { ...ele, title: updatedTodo.title } : ele
+                )
+            })
+
+            .addCase(editTodo.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.error.message
+            })
 
 
     },
@@ -80,7 +113,7 @@ const todoSlice = createSlice({
         isEdit: (state, action) => {
             state.isEditedValue = action.payload
         },
-        
+
     }
 
 })
