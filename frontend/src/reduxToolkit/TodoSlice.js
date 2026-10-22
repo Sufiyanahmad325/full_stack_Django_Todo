@@ -9,6 +9,21 @@ export const getTodos = createAsyncThunk(
         console.log(response.data)
         return response.data
     }
+);
+
+
+export const editTodo = createAsyncThunk(
+    "editTodo",
+    async({id,text})=>{
+        const response = await axios.patch(
+             `http://127.0.0.1:8000/api/todos/${id}/`,{title:text}
+        )
+
+        return {
+            id:response.data.id,
+            text:response.data.title
+        }
+    }
 )
 
 const initialState = {
@@ -38,32 +53,29 @@ const todoSlice = createSlice({
         })
 
 
+        //edit todo
+
+        .addCase(editTodo.pending , (state)=>{
+            state.error = null;
+            state.loading = true
+        })
+
+        .addCase(editTodo.fulfilled , (state,action)=>{
+            const updatedTodo = action.payload
+            state.blog = state.blog.map(ele=>{
+                ele.id === updatedTodo.id ? {...ele , text:updatedTodo.text}:ele
+            })
+        })
+
+        .addCase(editTodo.rejected,(state,action)=>{
+            state.loading= false
+            state.error = action.error.message
+        })
+
 
     },
 
     reducers: {
-        addTodo: (state, action) => {
-            const getInfo = {
-                id: nanoid(),
-                text: action.payload.text
-            }
-            state.blog = [...state.blog, getInfo]
-        },
-
-        editTodo: (state, action) => {
-            const { id, text } = action.payload;
-            state.blog = state.blog.map(
-                ele => ele.id === id
-                    ? { ...ele, text: text }
-                    : ele
-            )
-            state.isEditedValue = null
-        },
-
-        deleteTodo: (state, action) => {
-            const id = action.payload
-            state.blog = state.blog.filter(ele => ele.id != id)
-        },
 
         isEdit: (state, action) => {
             state.isEditedValue = action.payload
@@ -73,6 +85,6 @@ const todoSlice = createSlice({
 
 })
 
-export const { addTodo, editTodo, deleteTodo, isEdit } = todoSlice.actions
+export const { isEdit } = todoSlice.actions
 
 export default todoSlice.reducer
