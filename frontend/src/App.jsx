@@ -4,7 +4,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 import { useSelector, useDispatch } from 'react-redux'
-import { addTodo, editTodo, getTodos, isEdit } from './reduxToolkit/TodoSlice'
+import { addTodo, deleteTodo, editTodo, getTodos, isEdit } from './reduxToolkit/TodoSlice'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -30,8 +30,9 @@ function App() {
   }
 
 
-  const handleDelete = (id) => {
-    
+  const handleDelete = async(id) => {
+      const res =await dispatch(deleteTodo({id})).unwrap()
+      console.log(res)
   }
 
   useEffect(() => {

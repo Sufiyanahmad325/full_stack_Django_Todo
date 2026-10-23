@@ -14,7 +14,7 @@ export const getTodos = createAsyncThunk(
 
 export const addTodo = createAsyncThunk(
     "addTodo",
-    async ({title}) => {
+    async ({ title }) => {
         const response = await axios.post('http://127.0.0.1:8000/api/todos/', { title })
 
         return {
@@ -28,19 +28,28 @@ export const addTodo = createAsyncThunk(
 
 
 export const editTodo = createAsyncThunk(
-  "editTodo",
-  async ({ id, title }) => {
-    const response = await axios.patch(
-      `http://127.0.0.1:8000/api/todos/${id}/`,
-      { title }
-    );
+    "editTodo",
+    async ({ id, title }) => {
+        const response = await axios.patch(
+            `http://127.0.0.1:8000/api/todos/${id}/`,
+            { title }
+        );
 
-    return {
-      id: response.data.id,
-      title: response.data.title,
-    };
-  }
+        return {
+            id: response.data.id,
+            title: response.data.title,
+        };
+    }
 );
+
+
+export const deleteTodo = createAsyncThunk(
+    'deleteTodo',
+    async ({ id }) => {
+        const response = await await axios.delete(`http://127.0.0.1:8000/api/todos/${id}/`)
+        return id
+    }
+)
 
 const initialState = {
     blog: [],
@@ -105,6 +114,23 @@ const todoSlice = createSlice({
                 state.error = action.error.message
             })
 
+
+            // Delete Todo
+            .addCase(deleteTodo.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteTodo.fulfilled, (state, action) => {
+                state.loading = false;
+
+                state.blog = state.blog.filter(
+                    (todo) => todo.id !== action.payload
+                );
+            })
+            .addCase(deleteTodo.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
 
     },
 
